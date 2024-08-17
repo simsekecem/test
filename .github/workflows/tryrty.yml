@@ -3,7 +3,7 @@ name: Run Python Script Daily
 on:
   schedule:
     - cron: '10 20 * * *'  # Her gün saat 20:10 UTC'de çalıştır
-    workflow_dispatch: # Manuel tetikleme için
+  workflow_dispatch:  # Manuel olarak tetiklemek için
 
 jobs:
   run-script:
