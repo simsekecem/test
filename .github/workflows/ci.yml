@@ -22,11 +22,23 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
-    - name: Build and run Docker container
+    - name: Build Docker image
       run: |
         docker build -t selenium-tests .
-        docker run selenium-tests
 
-    - name: Save logs
+    - name: Run Docker container
+      id: run_container
+      run: |
+        docker run --name selenium-tests-container -d selenium-tests
+        docker ps -a  # Konteyner durumunu listeleyin
+
+    - name: Save logs if failure
       if: failure()
-      run: docker logs selenium-tests
+      run: |
+        docker logs selenium-tests-container || echo "No logs to display."
+
+    - name: Stop and remove Docker container
+      if: always()
+      run: |
+        docker stop selenium-tests-container || true
+        docker rm selenium-tests-container || true
