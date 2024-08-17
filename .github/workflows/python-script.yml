@@ -2,7 +2,7 @@ name: Run Python Script Daily
 
 on:
   schedule:
-    - cron: '0 20 * * *'  # Her gün saat 20:00 UTC'de çalıştır
+    - cron: '10 20 * * *'   # Her gün saat 20:00 UTC'de çalıştır
 
 jobs:
   run-script:
@@ -27,8 +27,8 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config --global user.email "your-email@example.com"
-          git config --global user.name "Your Name"
+          git config --global user.email "simsekecem@gmail.com"
+          git config --global user.name "simsekecem"
           git add .
           git commit -m "Update JSON files"
           git push
