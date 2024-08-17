@@ -33,6 +33,9 @@ jobs:
         docker run -d --name selenium-tests selenium-tests
         # Verileri konteynerden hosta kopyala
         docker cp selenium-tests:/app/data /home/runner/work/data
+        # Konteyneri durdur ve kaldır
+        docker stop selenium-tests
+        docker rm selenium-tests
 
     - name: Upload JSON files
       uses: actions/upload-artifact@v3
@@ -42,4 +45,4 @@ jobs:
 
     - name: Clean up
       run: |
-        docker rm -f selenium-tests
+        docker system prune -f  # Kullanılmayan Docker verilerini temizle
