@@ -26,13 +26,13 @@ jobs:
       run: docker build -t selenium-tests .
 
     - name: Ensure data directory exists
-      run: mkdir -p /home/runner/work/data
+      run: mkdir -p /home/runner/work/public
 
     - name: Run Docker container
       run: |
         docker run -d --name selenium-tests selenium-tests
         # Verileri konteynerden hosta kopyala
-        docker cp selenium-tests:/app/data /home/runner/work/data
+        docker cp selenium-tests:/app/data /home/runner/work/public
         # Konteyneri durdur ve kaldır
         docker stop selenium-tests
         docker rm selenium-tests
@@ -41,7 +41,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: json-files
-        path: /home/runner/work/data
+        path: /home/runner/work/public
 
     - name: Clean up
       run: |
