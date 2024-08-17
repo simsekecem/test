@@ -1,0 +1,32 @@
+name: Selenium Tests with Docker
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '10 20 * * *'  # Her gün saat 20:10'da UTC çalışacak
+  workflow_dispatch:  # Manuel tetikleme özelliği
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and run Docker container
+      run: |
+        docker build -t selenium-tests .
+        docker run selenium-tests
+
+    - name: Save logs
+      if: failure()
+      run: docker logs selenium-tests
