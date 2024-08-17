@@ -25,19 +25,19 @@ jobs:
       run: docker build -t selenium-tests .
 
     - name: Ensure data directory exists
-      run: mkdir -p /github/workspace/data
+      run: mkdir -p /home/runner/work/data
 
     - name: Run Docker container
       run: |
         docker run -d --name selenium-tests selenium-tests
         # Verileri konteynerden hosta kopyala
-        docker cp selenium-tests:/app/data /github/workspace/data
+        docker cp selenium-tests:/app/data /home/runner/work/data
 
     - name: Upload JSON files
       uses: actions/upload-artifact@v3
       with:
         name: json-files
-        path: /github/workspace/data
+        path: /home/runner/work/data
 
     - name: Clean up
       run: |
