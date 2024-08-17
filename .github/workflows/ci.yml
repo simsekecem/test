@@ -8,8 +8,8 @@ on:
     branches:
       - main
   schedule:
-    - cron: '10 20 * * *'  # Her gün saat 20:10'da UTC çalışacak
-  workflow_dispatch:  # Manuel tetikleme özelliği
+    - cron: '10 20 * * *'  # Her gün saat 20:10 UTC'de çalışacak
+  workflow_dispatch: # Manuel tetikleme desteği
 
 jobs:
   build:
@@ -23,22 +23,29 @@ jobs:
       uses: docker/setup-buildx-action@v1
 
     - name: Build Docker image
-      run: |
-        docker build -t selenium-tests .
+      run: docker build -t selenium-tests .
 
     - name: Run Docker container
-      id: run_container
       run: |
-        docker run --name selenium-tests-container -d selenium-tests
-        docker ps -a  # Konteyner durumunu listeleyin
+        # Run the container in detached mode and get its container ID
+        container_id=$(docker run -d selenium-tests)
+        echo "Container ID: $container_id"
 
-    - name: Save logs if failure
+        # Wait for the container to finish execution
+        docker wait $container_id
+
+        # Copy JSON files from the container to the host
+        docker cp $container_id:/app/data ./data
+
+        # Optionally, list the files to verify
+        ls -l ./data
+
+    - name: Upload JSON artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: json-files
+        path: ./data/*.json
+
+    - name: Save logs
       if: failure()
-      run: |
-        docker logs selenium-tests-container || echo "No logs to display."
-
-    - name: Stop and remove Docker container
-      if: always()
-      run: |
-        docker stop selenium-tests-container || true
-        docker rm selenium-tests-container || true
+      run: docker logs $(docker ps -lq)
