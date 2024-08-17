@@ -28,16 +28,13 @@ jobs:
     - name: Ensure data directory exists
       run: mkdir -p /home/runner/work/data
 
-    - name: Run Docker container
+    - name: Run Docker container and check data
       run: |
-        docker run -d --name selenium-tests selenium-tests
-        # Verileri konteynerden hosta kopyala
-        docker cp selenium-tests:/app/data /home/runner/work/data
-        # Konteyneri durdur ve kaldır
-        docker stop selenium-tests
-        docker rm selenium-tests
-        # İçeriği kontrol et
-        ls -al /home/runner/work/data
+        docker run -d --name temp-container selenium-tests
+        docker exec temp-container ls -al /app/data
+        docker cp temp-container:/app/data /home/runner/work/data
+        docker stop temp-container
+        docker rm temp-container
 
     - name: Upload JSON files
       uses: actions/upload-artifact@v3
