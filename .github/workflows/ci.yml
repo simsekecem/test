@@ -8,7 +8,8 @@ on:
     branches:
       - main
   schedule:
-    - cron: '10 20 * * *'  # Her gün saat 20:10'da UTC çalışacak
+    - cron: '10 20 * * *'  # Her gün saat 20:10 UTC'de çalışacak
+  workflow_dispatch:  # Manuel tetikleme için
 
 jobs:
   build:
