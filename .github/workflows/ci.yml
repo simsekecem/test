@@ -8,8 +8,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '10 20 * * *'  # Her gün saat 20:10 UTC'de çalışacak
-  workflow_dispatch: # Manuel tetikleme desteği
+    - cron: '10 20 * * *'  # Her gün saat 20:10'da UTC çalışacak
 
 jobs:
   build:
@@ -25,29 +24,16 @@ jobs:
     - name: Build Docker image
       run: docker build -t selenium-tests .
 
-    - name: Run Docker container and verify
+    - name: Run Docker container
       run: |
-        # Run the container and get its ID
-        container_id=$(docker run -d selenium-tests)
+        docker run -d --name selenium-tests selenium-tests
+        docker cp selenium-tests:/app/data /github/workspace/data
 
-        # Check if files are created in the container
-        docker exec $container_id ls -l /app/data
-
-        # Wait for the container to complete
-        docker wait $container_id
-
-        # Copy files from container to host
-        docker cp $container_id:/app/data ./data
-
-        # List files on host
-        ls -l ./data
-
-    - name: Upload JSON artifacts
-      uses: actions/upload-artifact@v2
+    - name: Upload JSON files
+      uses: actions/upload-artifact@v3
       with:
         name: json-files
-        path: ./data/*.json
+        path: /github/workspace/data
 
-    - name: Save logs
-      if: failure()
-      run: docker logs $container_id
+    - name: Clean up
+      run: docker rm -f selenium-tests
