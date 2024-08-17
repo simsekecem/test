@@ -1,0 +1,36 @@
+name: Run Python Script Daily
+
+on:
+  schedule:
+    - cron: '0 20 * * *'  # Her gün saat 20:00 UTC'de çalıştır
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run script
+        run: |
+          python main.py  # Çalıştırmak istediğiniz Python script'i
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "your-email@example.com"
+          git config --global user.name "Your Name"
+          git add .
+          git commit -m "Update JSON files"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
