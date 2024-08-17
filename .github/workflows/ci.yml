@@ -24,9 +24,13 @@ jobs:
     - name: Build Docker image
       run: docker build -t selenium-tests .
 
+    - name: Ensure data directory exists
+      run: mkdir -p /github/workspace/data
+
     - name: Run Docker container
       run: |
         docker run -d --name selenium-tests selenium-tests
+        # Verileri konteynerden hosta kopyala
         docker cp selenium-tests:/app/data /github/workspace/data
 
     - name: Upload JSON files
@@ -36,4 +40,5 @@ jobs:
         path: /github/workspace/data
 
     - name: Clean up
-      run: docker rm -f selenium-tests
+      run: |
+        docker rm -f selenium-tests
