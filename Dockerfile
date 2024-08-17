@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Python scriptinizi kopyala
 COPY main.py .
 
-# Verileri oluşturmak için dizin oluştur
+# Veriler için dizin oluştur
 RUN mkdir -p /app/data
 
 # Python scriptinizi çalıştır
