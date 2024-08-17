@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager  # Otomatik olarak doğru sürüm ChromeDriver indirir
 from selenium.webdriver.common.by import By
 import time
 import json
@@ -9,16 +10,13 @@ import os
 
 # Chrome için başsız mod seçeneklerini ayarlayın
 chrome_options = Options()
-chrome_options.add_argument("--headless")  # Başsız mod
-chrome_options.add_argument("--no-sandbox")  # Güvenlik sanal alanını devre dışı bırak
-chrome_options.add_argument("--disable-dev-shm-usage")  # Ortamda düşük disk alanı varsa devre dışı bırak
-chrome_options.add_argument('--disable-gpu')  # GPU kullanımını devre dışı bırak (bazı durumlarda gerekli olabilir)
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument('--disable-gpu')
 
-# ChromeDriver'ın yolunu belirleyin (manuel kurulum ile)
-driver_path = '/usr/local/bin/chromedriver'
-
-# WebDriver ile tarayıcıyı başlatın
-driver = webdriver.Chrome(service=Service(driver_path), options=chrome_options)
+# ChromeDriver'ı otomatik olarak indirip kullanma
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
 # Sayfayı aç
 url = 'https://open.spotify.com/artist/5RmQ8k4l3HZ8JoPb4mNsML'
@@ -34,17 +32,10 @@ song_elements = driver.find_elements(By.XPATH, "//div[@data-testid='tracklist-ro
 songs = []
 
 for song in song_elements:
-    # Şarkı ismini bul
-    song_name = song.find_element(By.XPATH,
-                                  ".//div[@class='encore-text encore-text-body-medium encore-internal-color-text-base btE2c3IKaOXZ4VNAb8WQ standalone-ellipsis-one-line']").text
-
-    # Dinlenme sayısını bul
+    song_name = song.find_element(By.XPATH, ".//div[@class='encore-text encore-text-body-medium encore-internal-color-text-base btE2c3IKaOXZ4VNAb8WQ standalone-ellipsis-one-line']").text
     plays = song.find_element(By.XPATH, ".//div[@class='encore-text encore-text-body-small HxDMwNr5oCxTOyqt85gi']").text
-
-    # Dinlenme sayısını sayı olarak sakla (noktalardan kurtul)
     plays = int(plays.replace('.', ''))
 
-    # Şarkı bilgilerini listeye ekle
     songs.append({
         "Şarkı Adı": song_name,
         "Dinlenme Sayısı": plays,
@@ -52,8 +43,10 @@ for song in song_elements:
         "Artış/Azalış": None
     })
 
-# Tarayıcıyı kapat
 driver.quit()
+
+# JSON dosyasına yazma işlemleri devam ediyor...
+
 
 # Bugünün tarihini al
 today = datetime.now().strftime('%Y-%m-%d')
