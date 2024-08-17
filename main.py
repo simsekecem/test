@@ -1,16 +1,24 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import time
 import json
 from datetime import datetime, timedelta
 import os
 
-# ChromeDriver'ı manuel olarak indirin ve kurun
-driver_path = '/usr/local/bin/chromedriver'  # ChromeDriver'ın yeri
+# Chrome için başsız mod seçeneklerini ayarlayın
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Başsız mod
+chrome_options.add_argument("--no-sandbox")  # Güvenlik sanal alanını devre dışı bırak
+chrome_options.add_argument("--disable-dev-shm-usage")  # Ortamda düşük disk alanı varsa devre dışı bırak
+chrome_options.add_argument('--disable-gpu')  # GPU kullanımını devre dışı bırak (bazı durumlarda gerekli olabilir)
 
-# ChromeDriver ile web tarayıcı başlatma
-driver = webdriver.Chrome(service=Service(driver_path))
+# ChromeDriver'ın yolunu belirleyin (manuel kurulum ile)
+driver_path = '/usr/local/bin/chromedriver'
+
+# WebDriver ile tarayıcıyı başlatın
+driver = webdriver.Chrome(service=Service(driver_path), options=chrome_options)
 
 # Sayfayı aç
 url = 'https://open.spotify.com/artist/5RmQ8k4l3HZ8JoPb4mNsML'
