@@ -25,24 +25,24 @@ jobs:
     - name: Build Docker image
       run: docker build -t selenium-tests .
 
-    - name: Ensure data directory exists
-      run: mkdir -p /home/runner/work/public
-
     - name: Run Docker container
       run: |
         docker run -d --name selenium-tests selenium-tests
         # Verileri konteynerden hosta kopyala
-        docker cp selenium-tests:/app/data /home/runner/work/public
+        docker cp selenium-tests:/app/data /home/runner/work/data
         # Konteyneri durdur ve kaldır
         docker stop selenium-tests
         docker rm selenium-tests
 
-    - name: Upload JSON files
-      uses: actions/upload-artifact@v3
-      with:
-        name: json-files
-        path: /home/runner/work/public
-
-    - name: Clean up
+    - name: Copy JSON files to repo
       run: |
-        docker system prune -f  # Kullanılmayan Docker verilerini temizle
+        mkdir -p $GITHUB_WORKSPACE/data
+        cp -r /home/runner/work/data/* $GITHUB_WORKSPACE/data/
+
+    - name: Commit and push data
+      uses: EndBug/add-and-commit@v9
+      with:
+        add: 'data/*'
+        message: 'Update JSON files'
+        author_name: 'GitHub Actions'
+        author_email: 'actions@github.com'
