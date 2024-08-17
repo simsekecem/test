@@ -28,9 +28,9 @@ jobs:
     - name: Ensure data directory exists
       run: mkdir -p /home/runner/work/data
 
-    - name: Run Docker container and check data
+    - name: Run Docker container and check for data
       run: |
-        docker run -d --name temp-container selenium-tests
+        docker run --name temp-container -d selenium-tests
         docker exec temp-container ls -al /app/data
         docker cp temp-container:/app/data /home/runner/work/data
         docker stop temp-container
