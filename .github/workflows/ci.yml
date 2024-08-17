@@ -25,19 +25,21 @@ jobs:
     - name: Build Docker image
       run: docker build -t selenium-tests .
 
-    - name: Run Docker container
+    - name: Run Docker container and verify
       run: |
-        # Run the container in detached mode and get its container ID
+        # Run the container and get its ID
         container_id=$(docker run -d selenium-tests)
-        echo "Container ID: $container_id"
 
-        # Wait for the container to finish execution
+        # Check if files are created in the container
+        docker exec $container_id ls -l /app/data
+
+        # Wait for the container to complete
         docker wait $container_id
 
-        # Copy JSON files from the container to the host
+        # Copy files from container to host
         docker cp $container_id:/app/data ./data
 
-        # Optionally, list the files to verify
+        # List files on host
         ls -l ./data
 
     - name: Upload JSON artifacts
@@ -48,4 +50,4 @@ jobs:
 
     - name: Save logs
       if: failure()
-      run: docker logs $(docker ps -lq)
+      run: docker logs $container_id
