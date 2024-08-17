@@ -1,2 +1,53 @@
-- name: List directory contents
-  run: ls -la /home/runner/work/data
+name: Selenium Tests with Docker
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '10 20 * * *'  # Her gün saat 20:10 UTC'de çalışacak
+  workflow_dispatch:  # Manuel tetikleme için
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build Docker image
+      run: docker build -t selenium-tests .
+
+    - name: Ensure data directory exists
+      run: mkdir -p /home/runner/work/data
+
+    - name: Run Docker container and check for data
+      run: |
+        docker run --name temp-container -d selenium-tests
+        docker exec temp-container ls -al /app/data
+        docker cp temp-container:/app/data /home/runner/work/data
+        docker stop temp-container
+        docker rm temp-container
+
+    - name: List files in data directory
+      run: |
+        echo "Listing files in /home/runner/work/data"
+        ls -al /home/runner/work/data
+
+    - name: Upload JSON files
+      uses: actions/upload-artifact@v3
+      with:
+        name: json-files
+        path: /home/runner/work/data
+
+    - name: Clean up
+      run: |
+        docker system prune -f  # Kullanılmayan Docker verilerini temizle
+
