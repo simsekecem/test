@@ -1,0 +1,44 @@
+name: Run Python Script Daily
+
+on:
+  schedule:
+    - cron: '10 20 * * *'  # Her gün saat 20:10 UTC'de çalıştır
+    workflow_dispatch: # Manuel tetikleme için
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Download and install ChromeDriver
+        run: |
+          curl -O https://chromedriver.storage.googleapis.com/127.0.6533/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/chromedriver
+          sudo chmod +x /usr/local/bin/chromedriver
+
+      - name: Run script
+        run: |
+          python main.py  # Çalıştırmak istediğiniz Python script'i
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "simsekecem@gmail.com"
+          git config --global user.name "simsekecem"
+          git add .
+          git commit -m "Update JSON files"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
