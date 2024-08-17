@@ -1,14 +1,16 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import time
 import json
 from datetime import datetime, timedelta
 import os
 
-# ChromeDriver'ı otomatik olarak indirip kullanma
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+# ChromeDriver'ı manuel olarak indirin ve kurun
+driver_path = '/usr/local/bin/chromedriver'  # ChromeDriver'ın yeri
+
+# ChromeDriver ile web tarayıcı başlatma
+driver = webdriver.Chrome(service=Service(driver_path))
 
 # Sayfayı aç
 url = 'https://open.spotify.com/artist/5RmQ8k4l3HZ8JoPb4mNsML'
@@ -85,8 +87,3 @@ filename = f'songs_{today}.json'
 # Bugünkü veriyi JSON dosyasına yaz
 with open(filename, 'w', encoding='utf-8') as f:
     json.dump(songs, f, ensure_ascii=False, indent=4)
-
-# Dosyayı GitHub'a yüklemek için çalıştırılacak komut
-os.system(f'git add {filename}')
-os.system(f'git commit -m "Add {filename}"')
-os.system(f'git push')
